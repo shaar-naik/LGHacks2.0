@@ -9,17 +9,9 @@ import time
 # ---------------------------
 # Configuration
 # ---------------------------
-API_URL = "https://www.volunteerconnector.org/api/search/"
-API_HEADERS = {
-    "User-Agent": "Mozilla/5.0"
-    # "Authorization": "Bearer YOUR_API_KEY_HERE"  # uncomment if needed
-}
-API_PARAMS = {
-    # "city": "San Jose",
-    # "state": "CA",
-    # "cause": "education",
-    "limit": 50
-}
+CSV_FILE = "volunteer_opportunities.csv"
+
+from APIs import APIS
 
 
 # ---------------------------
@@ -133,34 +125,66 @@ def parse_opportunity(url):
 
 
 # ---------------------------
-# Main workflow
+# Append opportunities to CSV
 # ---------------------------
-def main():
-    print("Fetching URLs from API...")
-    urls = fetch_api_urls(API_URL, API_PARAMS, API_HEADERS)
-    print(f"Found {len(urls)} URLs.")
-
-    opportunities = []
-
-    for i, url in enumerate(urls, 1):
-        print(f"[{i}/{len(urls)}] Parsing {url}")
-        opp = parse_opportunity(url)
-        if opp:
-            opportunities.append(opp)
-        time.sleep(1)  # polite delay
-
-    # Sort by category
-    opportunities.sort(key=lambda x: x["category"])
-
-    # Save to CSV
-    csv_file = "volunteer_opportunities.csv"
-    with open(csv_file, "w", newline="", encoding="utf-8") as f:
+def append_to_csv(filename, opportunities):
+    with open(filename, "a", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["title", "description", "category", "url"])
-        writer.writeheader()
         for opp in opportunities:
             writer.writerow(opp)
 
-    print(f"Done! {len(opportunities)} opportunities saved to {csv_file}")
+
+# ---------------------------
+# Deduplicate CSV by URL (pure Python)
+# ---------------------------
+def deduplicate_csv(filename):
+    seen = set()
+    rows = []
+    with open(filename, "r", newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if row["url"] not in seen:
+                seen.add(row["url"])
+                rows.append(row)
+    with open(filename, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=["title", "description", "category", "url"])
+        writer.writeheader()
+        for row in rows:
+            writer.writerow(row)
+
+
+# ---------------------------
+# Main workflow
+# ---------------------------
+def main():
+    # Initialize CSV with headers
+    with open(CSV_FILE, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=["title", "description", "category", "url"])
+        writer.writeheader()
+
+    for api in APIS:
+        print(f"Fetching URLs from {api['url']}")
+        urls = fetch_api_urls(api["url"], api["params"], api["headers"])
+        print(f"Found {len(urls)} URLs.")
+
+        opportunities = []
+        for i, url in enumerate(urls, 1):
+            print(f"[{i}/{len(urls)}] Parsing {url}")
+            opp = parse_opportunity(url)
+            if opp:
+                opportunities.append(opp)
+            time.sleep(1)  # polite delay
+
+        # Sort by category
+        opportunities.sort(key=lambda x: x["category"])
+
+        # Append to CSV
+        append_to_csv(CSV_FILE, opportunities)
+        print(f"Appended {len(opportunities)} opportunities to {CSV_FILE}")
+
+    # Deduplicate by URL
+    deduplicate_csv(CSV_FILE)
+    print("Deduplicated CSV by URL. Done!")
 
 
 if __name__ == "__main__":
