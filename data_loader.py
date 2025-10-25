@@ -54,7 +54,7 @@ class OpportunityParser(HTMLParser):
 
 
 # ---------------------------
-# Fetch URLs from API
+# Fetch URLs from any JSON API
 # ---------------------------
 def fetch_api_urls(api_url, params, headers):
     query_string = urllib.parse.urlencode(params)
@@ -66,14 +66,14 @@ def fetch_api_urls(api_url, params, headers):
             data = response.read().decode("utf-8")
             json_data = json.loads(data)
     except Exception as e:
-        print("Error fetching API data:", e)
+        print(f"Error fetching API data from {api_url}: {e}")
         return []
 
-    # Recursively find all URLs in JSON
+    # Recursively find all URLs in the JSON structure
     def find_urls(obj):
         urls = []
         if isinstance(obj, dict):
-            for k, v in obj.items():
+            for v in obj.values():
                 urls.extend(find_urls(v))
         elif isinstance(obj, list):
             for item in obj:
@@ -135,7 +135,7 @@ def append_to_csv(filename, opportunities):
 
 
 # ---------------------------
-# Deduplicate CSV by URL (pure Python)
+# Deduplicate CSV by URL
 # ---------------------------
 def deduplicate_csv(filename):
     seen = set()
