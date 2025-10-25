@@ -1,8 +1,6 @@
 import tkinter as tk
 import sys
 import textwrap
-from tkinter import OptionMenu
-from tkinter.constants import VERTICAL
 
 introText = """
 Are you interested in volunteering? Do you have a hard time looking for what volunteering places suit you? 
@@ -14,7 +12,6 @@ If other, please write it out
 
 Here are the list of volunteering opportunities:
 """
-outputTextString1 = "Anime is a unique form of Japanese animation that blends art, storytelling, and emotion in powerful ways. It covers a wide range of genres, from action and romance to science fiction and slice of life. Unlike many Western cartoons, anime often explores deep themes about life, identity, and human connection. Its vibrant visuals and expressive characters attract fans worldwide. Beyond entertainment, anime inspires creativity, art, and culture, making it a global phenomenon that continues to grow in influence and popularity."
 
 window = tk.Tk()
 window.title("Volunteer App")
@@ -25,7 +22,7 @@ def closewindow():
     sys.exit(0)
 
 def decide():
-    chunks = textwrap.wrap(outputTextString1, 73)
+    chunks = textwrap.wrap(summary, 73)
     printOutputText = "\n"
     for chunk in chunks:
         printOutputText = printOutputText + chunk + "\n"
@@ -78,7 +75,7 @@ decideButton = tk.Button(text="Decide", command=decide, font=("Arial", 18), widt
 decideButton.place(relx=0.01, rely=0.73, anchor="nw")
 
 exitWindow = tk.Button(text="Exit Window", command=closewindow, font=("Arial", 18), width=10, height=2)
-exitWindow.place(relx=0.13, rely=0.73, anchor="nw")
+exitWindow.place(relx=0.88, rely=0.88, anchor="nw")
 
 window.mainloop()
 

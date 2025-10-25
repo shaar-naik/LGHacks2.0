@@ -2,11 +2,11 @@ import pandas as pd
 from transformers import pipeline
 
 # === CONFIG ===
-csv_file = "volunteer_opportunities.csv"    # your input file
+csv_file = "csv files/volunteer_opportunities.csv"  # your input file
 title_col = "title"               # name of title column
 desc_col = "description"          # name of description column
 category_col = "category"         # name of category column
-output_file = "category_summaries.csv"
+output_file = "csv files/category_summaries.csv"
 
 # === LOAD CSV ===
 df = pd.read_csv(csv_file)
