@@ -9,7 +9,7 @@ import time
 # ---------------------------
 # Configuration
 # ---------------------------
-CSV_FILE = "volunteer_opportunities.csv"
+CSV_FILE = "csv files/volunteer_opportunities.csv"
 
 from APIs import APIS
 
